@@ -6,31 +6,124 @@ import {
   View,
   Button,
   AppRegistry,
-  TextInput
+  TextInput,
+  AsyncStorage
 } from 'react-native';
 import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.14
+// import AsyncStorageExample from './AsyncStorageExample'
 
 function _onChangeUserName(text){
   alert(text);
 }
 
-const HomeScreen = ({ navigation }) => (
+
+
+class HomeScreen extends React.Component {
+
+  constructor(){
+
+    super();
+
+    this.inputUserName = null;
+    this.inputPassword = null;
+
+    this.onChangeUserName = this.onChangeUserName.bind(this);
+    this.onChangePassword = this.onChangePassword.bind(this);
+    this.onCreateAccount = this.onCreateAccount.bind(this);
+
+  }
+
+  onChangeUserName(text){
+    this.inputUserName = text;
+  }
+
+  onChangePassword(text){
+    this.inputPassword = text;
+  }
+
+  onCreateAccount(){
+
+    // alert(this.inputUserName);
+    // alert(this.inputPassword);
+
+    let newAccount = {
+      userName : this.inputUserName,
+      password : this.inputPassword,
+    }
+
+    AsyncStorage.getItem("ACCOUNT_LIST").then((value) => {
+
+        let accountList = JSON.parse(value);
+
+        if(!accountList){
+          accountList = {};
+        }
+
+        accountList["USER_" + newAccount.userName] = newAccount;
+
+        console.log(accountList);
+
+        AsyncStorage.setItem("ACCOUNT_LIST",JSON.stringify(accountList)).then((value) => {
+
+        });
+
+    });
+
+  }
+
+  render(){
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Home Screen</Text>
+        <TextInput
+          style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
+          onChangeText={this.onChangeUserName}
+          placeholder="ログインID"
+        />
+        <TextInput
+          style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
+          onChangeText={this.onChangePassword}
+          placeholder="パスワード"
+        />
+        <Button
+          onPress={() => navigation.navigate('Details')}
+          title="ログイン"
+        />
+
+        <Button
+          onPress={this.onCreateAccount}
+          title="新規作成"
+        />
+      </View>
+    );
+  }
+
+// function _onRegisterUserName(text){
+//   AsyncStorage.getItem('data').then((value) => {
+//          this.setState({'data': value}) ;
+//          alert(value);
+//       });
+}
+const NewAcountScreen = ({ navigation }) => (
   <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Home Screen</Text>
+    <Text>Setting Screen</Text>
     <TextInput
       style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
-      onChangeText={_onChangeUserName}
+      // onChange={_onRegisterUserName}
       placeholder="ログインID"
+      id = "userName"
     />
     <TextInput
       style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
-      onChangeText={_onChangeUserName}
+      // onChangeText={_onChangeUserName}
       placeholder="パスワード"
+      id = "password"
     />
     <Button
-      onPress={() => navigation.navigate('Details')}
-      title="ログイン"
+      onPress={_RegisterAcount}
+      title="登録"
     />
+
   </View>
 );
 
@@ -78,6 +171,25 @@ const SettingsScreen = ({ navigation }) => (
   </View>
 );
 
+// let UID123_object = {
+//   name: 'Chris',
+//   age: 30,
+//   traits: {hair: 'brown', eyes: 'brown'},
+// };
+// // You only need to define what will be added or updated
+// let UID123_delta = {
+//   age: 31,
+//   traits: {eyes: 'blue', shoe_size: 10}
+// };
+// AsyncStorage.setItem('UID123', JSON.stringify(UID123_object), () => {
+//   AsyncStorage.mergeItem('UID123', JSON.stringify(UID123_delta), () => {
+//     AsyncStorage.getItem('UID123', (err, result) => {
+//       alert(result);
+//     });
+//   });
+// });
+
+
 const ChatroomScreen = ({ navigation }) => (
   <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
     <Text>Chatroom Screen</Text>
@@ -101,6 +213,12 @@ const RootNavigator = StackNavigator({
     screen: HomeScreen,
     navigationOptions: {
       headerTitle: 'Home',
+    },
+  },
+  NewAcount: {
+    screen: NewAcountScreen,
+    navigationOptions: {
+      headerTitle: 'NewAcount',
     },
   },
   Details: {
