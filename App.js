@@ -10,7 +10,6 @@ import {
   AsyncStorage
 } from 'react-native';
 import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.14
-// import AsyncStorageExample from './AsyncStorageExample'
 
 function _onChangeUserName(text){
   alert(text);
@@ -42,10 +41,6 @@ class HomeScreen extends React.Component {
   }
 
   onCreateAccount(){
-
-    // alert(this.inputUserName);
-    // alert(this.inputPassword);
-
     let newAccount = {
       userName : this.inputUserName,
       password : this.inputPassword,
@@ -86,127 +81,176 @@ class HomeScreen extends React.Component {
           placeholder="パスワード"
         />
         <Button
-          onPress={() => navigation.navigate('Details')}
+          onPress={() => this.props.navigation.navigate('Details')}
           title="ログイン"
         />
 
         <Button
-          onPress={this.onCreateAccount}
+          onPress={() => this.props.navigation.navigate('NewAcount')}
           title="新規作成"
         />
       </View>
     );
   }
 
-// function _onRegisterUserName(text){
-//   AsyncStorage.getItem('data').then((value) => {
-//          this.setState({'data': value}) ;
-//          alert(value);
-//       });
 }
-const NewAcountScreen = ({ navigation }) => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Setting Screen</Text>
-    <TextInput
-      style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
-      // onChange={_onRegisterUserName}
-      placeholder="ログインID"
-      id = "userName"
-    />
-    <TextInput
-      style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
-      // onChangeText={_onChangeUserName}
-      placeholder="パスワード"
-      id = "password"
-    />
-    <Button
-      onPress={_RegisterAcount}
-      title="登録"
-    />
 
-  </View>
-);
+class NewAcountScreen extends React.Component {
 
-const DetailsScreen = ({ navigation }) => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Details Screen</Text>
-    <Button
-      onPress={() => navigation.navigate('Settings')}
-      title="ユーザー管理画面"
-    />
-    <Button
-      onPress={() => navigation.navigate('Chatroom')}
-      title="チャットルーム"
-    />
-    <Button
-      onPress={() => navigation.navigate('Home')}
-      title="ログアウト"
-    />
-  </View>
-);
+  constructor(){
 
-const SettingsScreen = ({ navigation }) => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Setting Screen</Text>
-    <TextInput
-      style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
-      onChangeText={_onChangeUserName}
-      placeholder="ログインID"
-    />
-    <TextInput
-      style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
-      onChangeText={_onChangeUserName}
-      placeholder="パスワード"
-    />
-    <Button
-      onPress={() => navigation.navigate('Details')}
-      title="登録"
-    />
-    <Text
-      style={styles.alluser}
-    >
-    ユーザー一覧
-    </Text>
-    <Text>icon,username,登録day,delete</Text>
-  </View>
-);
+    super();
 
-// let UID123_object = {
-//   name: 'Chris',
-//   age: 30,
-//   traits: {hair: 'brown', eyes: 'brown'},
-// };
-// // You only need to define what will be added or updated
-// let UID123_delta = {
-//   age: 31,
-//   traits: {eyes: 'blue', shoe_size: 10}
-// };
-// AsyncStorage.setItem('UID123', JSON.stringify(UID123_object), () => {
-//   AsyncStorage.mergeItem('UID123', JSON.stringify(UID123_delta), () => {
-//     AsyncStorage.getItem('UID123', (err, result) => {
-//       alert(result);
-//     });
-//   });
-// });
+    this.inputUserName = null;
+    this.inputPassword = null;
 
+    this.onChangeUserName = this.onChangeUserName.bind(this);
+    this.onChangePassword = this.onChangePassword.bind(this);
+    this.onCreateAccount = this.onCreateAccount.bind(this);
 
-const ChatroomScreen = ({ navigation }) => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>Chatroom Screen</Text>
-    <Button
-      onPress={() => alert("投稿")}
-      title="投稿"
-    />
-    <Button
-      onPress={() => alert("削除")}
-      title="削除"
-    />
-    <Button
-      onPress={() => navigation.navigate('Home')}
-      title="ログアウト"
-    />
-  </View>
-);
+  }
+
+  onChangeUserName(text){
+    this.inputUserName = text;
+  }
+
+  onChangePassword(text){
+    this.inputPassword = text;
+  }
+
+  onCreateAccount(){
+    let newAccount = {
+      userName : this.inputUserName,
+      password : this.inputPassword,
+      // () => this.props.navigation.() => this.props.navigation.navigate('Home')
+    }
+
+    AsyncStorage.getItem("ACCOUNT_LIST").then((value) => {
+
+        let accountList = JSON.parse(value);
+
+        if(!accountList){
+          accountList = {};
+        }
+
+        accountList["USER_" + newAccount.userName] = newAccount;
+
+        console.log(accountList);
+
+        AsyncStorage.setItem("ACCOUNT_LIST",JSON.stringify(accountList)).then((value) => {
+
+        });
+
+    });
+
+  }
+
+  render(){
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>newAccount Screen</Text>
+        <TextInput
+          style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
+          onChangeText={this.onChangeUserName}
+          placeholder="ログインID"
+        />
+        <TextInput
+          style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
+          onChangeText={this.onChangePassword}
+          placeholder="パスワード"
+        />
+
+        <Button
+          onPress={this.onCreateAccount}
+          title="新規作成はこちら"
+        />
+      </View>
+    );
+  }
+
+}
+
+class DetailsScreen extends React.Component {
+  constructor(){
+    super();
+  }
+  render(){
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Details Screen</Text>
+        <Button
+          onPress={() => this.props.navigation.navigate('Settings')}
+          title="ユーザー管理画面"
+        />
+        <Button
+          onPress={() => this.props.navigation.navigate('Chatroom')}
+          title="チャットルーム"
+        />
+        <Button
+          onPress={() => this.props.navigation.navigate('Home')}
+          title="ログアウト"
+        />
+      </View>
+    );
+  }
+
+}
+
+class SettingsScreen extends React.Component {
+  constructor(){
+    super();
+  }
+  render(){
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Setting Screen</Text>
+        <TextInput
+          style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
+          onChangeText={_onChangeUserName}
+          placeholder="ログインID"
+        />
+        <TextInput
+          style={{height: 40,width: 80,borderColor: 'gray',borderBottomWidth: 1}}
+          onChangeText={_onChangeUserName}
+          placeholder="パスワード"
+        />
+        <Button
+          onPress={() => this.props.navigation.navigate('Details')}
+          title="登録"
+        />
+        <Text style={styles.alluser}>ユーザー一覧</Text>
+        <Text>icon,username,登録day,delete</Text>
+      </View>
+    );
+  }
+
+}
+
+class ChatroomScreen extends React.Component {
+  constructor(){
+    super();
+
+  }
+  render(){
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Chatroom Screen</Text>
+        <Button
+          onPress={() => alert("投稿")}
+          title="投稿"
+        />
+        <Button
+          onPress={() => alert("削除")}
+          title="削除"
+        />
+        <Button
+          onPress={() => this.props.navigation.navigate('Home')}
+          title="ログアウト"
+        />
+      </View>
+    );
+  }
+}
 
 const RootNavigator = StackNavigator({
   Home: {
@@ -289,7 +333,7 @@ export default RootNavigator;
 //        }
   //   _onPress(e){
   //     alert("onPressLearnMore");
-  //     this.props.navigation.navigate('Profile', {name: a});
+  //     this.props.() => this.props.navigation.() => this.props.navigation.navigate('Profile', {name: a});
   //   }
    //
   //   _onChangeUserName(text){
